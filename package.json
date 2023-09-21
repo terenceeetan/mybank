@@ -7,8 +7,10 @@
   "author": "Me",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^16.3.1",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
+    "mysql2": "^3.6.1",
     "pug": "^3.0.2"
   }
 }

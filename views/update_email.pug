@@ -1,0 +1,21 @@
+extends navbar.pug
+block content
+    div(class="container")
+        form(action="/update_email_address", method="post")
+            div(class="col")
+                label(for="old_email", class= "pe-2")= "Your current email address: "
+                input(class="pb-2", type= "email", id= "old_email", name="old_email")
+            div(class="col")
+                label(for="new_email", class= "pe-2")= "Your new email address: "
+                input(class="pb-2", type= "email", id= "new_email", name="new_email")
+            div(class="col")
+                label(for="confirm_new_email", class= "pe-2")= "Confirm your new email address: "
+                input(class="pb-2", type= "email", id= "confirm_new_email", name="confirm_new_email")
+
+            button(class="btn btn-primary", type="submit")= "Submit"
+
+    if error 
+        p(class="alert alert-danger")=error
+
+    if success 
+        p(class="alert alert-success")=success
