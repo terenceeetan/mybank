@@ -101,7 +101,7 @@ app.post("/update_email_address", (req, res) => {
     (err, results) => {
       if (err) {
         console.error(err);
-        res.render("login", { error: "An error occurred while processing your request" });
+        res.render("update_email", { error: "An error occurred while processing your request" });
       } else if (results.affectedRows > 0) {
         // When affectedRows more than 0 it means that the change was successful
         res.render("update_email", {success: "Email updated successfully"});
@@ -124,7 +124,8 @@ app.get("/user", (req, res) => {
           res.render("login", { error: "An error occurred while processing your request" });
         } else if (results.length > 0) {
           // Managed to find user based on user ID, pass data as context to user view
-          res.render("user", {username: results[0]['username'], password: results[0]['password'], email_address: results[0]['email']});
+          encoded_password = new Array(results[0]['password'].length + 1).join("*");
+          res.render("user", {username: results[0]['username'], password: encoded_password, email_address: results[0]['email']});
         } else {
           // If no matching user is found, render the login page with an error message
           res.render("login", { error: "An error occurred while processing your request" });

@@ -1,11 +1,6 @@
 extends navbar.pug
 block content
-  div(class="container")
-    h2(class="pb-2")="username : " + username
-    h2(class="pb-2")="password : " + password
-    h2(class="pb-2")="email address : " + email_address
-
-
+  
   div(class="row")
     div(class="col")
       a(href="/balance")="View Account Balance"
@@ -18,5 +13,19 @@ block content
 
     div(class="col")
       a(href="/update_email_address")="Update your email address"
+
+
+
+  
+  #table-wrapper
+    table
+      tr 
+        td(height= '20px')= "username : " + username
+      tr 
+        td(height= '20px')= "password : " + password
+      tr  
+        td(height= '20px')= "email address : " + email_address
+
+      
 
       
