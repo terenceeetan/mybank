@@ -42,6 +42,7 @@ app.post("/login", (req, res) => {
         // If a user with matching credentials is found, set the session as authenticated
         req.session.isLoggedIn = true
         req.session.userID = results[0]['id']
+        // if there is an existing redirect url, go, if not, go to home page
         res.redirect(req.query.redirect_url ? req.query.redirect_url : "/");
       } else {
         // If no matching user is found, render the login page with an error message
@@ -54,11 +55,13 @@ app.post("/login", (req, res) => {
 /** Handle logout function */
 app.get("/logout", (req, res) => {
   req.session.isLoggedIn = false;
+  req.session.userID = "";
   res.redirect("/");
 });
 
-/** Simulated bank functionality */
+// Show home page 
 app.get("/", (req, res) => {
+  //if session variable isLoggedIn is set, show log out button. Refer to index.pug
   res.render("index", { isLoggedIn: req.session.isLoggedIn });
 });
 
@@ -70,6 +73,7 @@ app.get("/balance", (req, res) => {
   }
 });
 
+// Show account page
 app.get("/account", (req, res) => {
   if (req.session.isLoggedIn === true) {
     res.send("Your account number is ACL9D42294");
@@ -78,10 +82,12 @@ app.get("/account", (req, res) => {
   }
 });
 
+// Show contact page
 app.get("/contact", (req, res) => {
   res.send("Our address : 321 Main Street, Beverly Hills.");
 });
 
+// Show update email address page
 app.get("/update_email_address", (req, res) => {
   if (req.session.isLoggedIn === true) {
     res.render(view= "update_email");
@@ -90,29 +96,32 @@ app.get("/update_email_address", (req, res) => {
   }
 })
 
+// User submit update email address form
 app.post("/update_email_address", (req, res) => {
-  const { old_email, new_email, confirm_email } = req.body;
-  if (new_email != confirm_email) {
-    res.render("update_email", {error: "New email address does not match"}) 
-  }
-  db.query(
-    "UPDATE accounts SET email=(?) WHERE id =? AND email=?",
-    [new_email, req.session.userID, old_email],
-    (err, results) => {
-      if (err) {
-        console.error(err);
-        res.render("update_email", { error: "An error occurred while processing your request" });
-      } else if (results.affectedRows > 0) {
-        // When affectedRows more than 0 it means that the change was successful
-        res.render("update_email", {success: "Email updated successfully"});
-      } else {
-        // If no matching user is found, render the update email view with an error message
-        res.render("update_email", { error: "Your email does not match your account's record" });
+  const { old_email, new_email, confirm_new_email } = req.body;
+  if (new_email != confirm_new_email) {
+    res.render("update_email", {error: "New email address does not match"})
+  } else {
+    db.query(
+      "UPDATE accounts SET email=(?) WHERE id =? AND email=?",
+      [new_email, req.session.userID, old_email],
+      (err, results) => {
+        if (err) {
+          console.error(err);
+          res.render("update_email", { error: "An error occurred while processing your request" });
+        } else if (results.affectedRows > 0) {
+          // When affectedRows more than 0 it means that the change was successful
+          res.render("update_email", {success: "Email updated successfully"});
+        } else {
+          // If no matching user is found, render the update email view with an error message
+          res.render("update_email", { error: "Your email does not match your account's record" });
+        }
       }
-    }
-  );
+    );
+  }
 })
 
+// Show user details
 app.get("/user", (req, res) => {
   if (req.session.isLoggedIn === true) {
     db.query(
@@ -124,7 +133,7 @@ app.get("/user", (req, res) => {
           res.render("login", { error: "An error occurred while processing your request" });
         } else if (results.length > 0) {
           // Managed to find user based on user ID, pass data as context to user view
-          encoded_password = new Array(results[0]['password'].length + 1).join("*");
+          encoded_password = new Array(results[0]['password'].length + 1).join("*");  // encode password into "****"
           res.render("user", {username: results[0]['username'], password: encoded_password, email_address: results[0]['email']});
         } else {
           // If no matching user is found, render the login page with an error message
@@ -132,7 +141,6 @@ app.get("/user", (req, res) => {
         }
       }
     );
-    
   } else {
     res.redirect("/login?redirect_url=/user");
   }
